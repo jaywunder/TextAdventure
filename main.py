@@ -7,13 +7,15 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.graphics import Rectangle, Color
 
+from random import randint, choice
 from character import Character
+import copy
 
 """░ ▒ ▓ │ ┤ ╡ ╢ ╖ ╕ ╣ ║ ╗ ╝ ╜ ╛ ┐ └ ┴ ┬ ├ ─ ┼ ╞ ╟ ╚ ╔ ╩ ╦ ╠ ═ ╬ ╧ ╨ ╤
 ╥ ╙ ╘ ╒ ╓ ╫ ╪ ┘ ┌ █ ▄ ▌ ▐  ▀ ■ ⌂ ☼ § ∟ ▲ ▼ ♂ ♀ ☺ ☻ ♥ ♦ ♣ ♠ • ○ ◘ ♪ ♫
 ↑ ↓ → ← ↔"""
 
-LENGTH = 20
+LENGTH = 50
 upperWall = "▄▄"
 floor = "▀▀"
 leftWall = "▌ "
@@ -22,6 +24,7 @@ space = "  "
 lightShading = "░░"
 medShading = "▒▒"
 darkShading = "▓▓"
+stones = "▒▒"
 RIGHTKEY = 124
 UPKEY = 126
 LEFTKEY = 123
@@ -33,15 +36,17 @@ class TextAdventureGame(FloatLayout):
         super(TextAdventureGame, self).__init__()
         self.backgroundWidget = Widget()
         with self.backgroundWidget.canvas.before:
-            # Color(146. / 256., 76. / 256., 0., .5)
+            # Color(76. / 256., 230. / 256., 0., .5)
             Rectangle(pos=(0, 0), size=Window.size)
 
         self.char = Character()
         self.world = self.createLandscape()
-        self.worldWithCharacter = self.placeChar(self.world, self.char)
+        self.world = self.generateTerrain(self.world)
+        self.worldWithCharacter = list(self.world)
+        self.worldWithCharacter = self.placeChar(self.worldWithCharacter, self.char)
         self.worldLabel = Label(
             color=(76. / 256., 146. / 256., 0., 1.),
-            text=self.joinRoom(self.worldWithCharacter),
+            text=self.joinRoom(self.world),
             markup=True,
             center_x=Window.width / 2,
             center_y=Window.height / 2,
@@ -79,12 +84,13 @@ class TextAdventureGame(FloatLayout):
                 self.char.pos[0] += 1
 
         # print(self.char.pos)
-        self.worldWithCharacter = self.placeChar(self.world, self.char)
+        self.worldWithCharacter = self.world[:]
+        self.worldWithCharacter = self.placeChar(self.worldWithCharacter, self.char)
         self.worldLabel.text = self.joinRoom(self.world)
         self.worldLabel.texture_update()
 
     def placeChar(self, room, char):
-        newRoom = list(room)
+        newRoom = room[:]
         newRoom[char.pos[1]][char.pos[0]] = char.head
         newRoom[char.pos[1] + 1][char.pos[0]] = char.body
         return newRoom
@@ -118,8 +124,24 @@ class TextAdventureGame(FloatLayout):
             row[-1] = darkShading
         return landscape
 
-    def generateTerrain(self):
-        pass
+    def generateTerrain(self, room):
+        roomWithTerrain = room[:]
+        numbers = [-1, -1, 1, 1, 2]
+        for i in range(randint(LENGTH / 10, LENGTH / 2)):
+            stonesCoord = [randint(3, LENGTH - 3), randint(3, LENGTH - 3)]
+            roomWithTerrain[stonesCoord[1]][stonesCoord[0]] = stones
+            for j in range(randint(5, 10)):
+                try:
+                    roomWithTerrain[stonesCoord[1] + choice(numbers)][stonesCoord[0] + choice(numbers)] = stones
+                except IndexError:
+                    pass
+        border = [darkShading for i in range(LENGTH)]
+        roomWithTerrain[0] = border
+        roomWithTerrain[-1] = border
+        for row in roomWithTerrain:
+            row[0] = darkShading
+            row[-1] = darkShading
+        return roomWithTerrain
 
 
 class TextAdventureApp(App):

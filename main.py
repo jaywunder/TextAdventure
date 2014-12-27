@@ -15,7 +15,7 @@ import copy
 ╥ ╙ ╘ ╒ ╓ ╫ ╪ ┘ ┌ █ ▄ ▌ ▐  ▀ ■ ⌂ ☼ § ∟ ▲ ▼ ♂ ♀ ☺ ☻ ♥ ♦ ♣ ♠ • ○ ◘ ♪ ♫
 ↑ ↓ → ← ↔"""
 
-LENGTH = 50
+LENGTH = 100
 upperWall = "▄▄"
 floor = "▀▀"
 leftWall = "▌ "
@@ -25,6 +25,8 @@ lightShading = "░░"
 medShading = "▒▒"
 darkShading = "▓▓"
 stones = "▒▒"
+flooring1 = "▞▞"
+flooring2 = "▚▚"
 RIGHTKEY = 124
 UPKEY = 126
 LEFTKEY = 123
@@ -42,6 +44,8 @@ class TextAdventureGame(FloatLayout):
         self.char = Character()
         self.world = self.createLandscape()
         self.world = self.generateTerrain(self.world)
+        for i in range(randint(3, 6)):
+            self.createRoom(self.world)
         self.worldWithCharacter = list(self.world)
         self.worldWithCharacter = self.placeChar(self.worldWithCharacter, self.char)
         self.worldLabel = Label(
@@ -104,15 +108,18 @@ class TextAdventureGame(FloatLayout):
                 finalRoom += slot
         return finalRoom
 
-    def createRoom(self):
-        row_template = [space] * LENGTH
-        room = [row_template] * LENGTH
-        for r, row in enumerate(room):
+    def createRoom(self, room):
+        pos = (randint(3, LENGTH - int(LENGTH / 10) - 3),
+               randint(3, LENGTH - int(LENGTH / 10) - 3))
+        smallRoom = [[flooring1 for i in range(LENGTH / 10)] for j in range(LENGTH / 10)]
+        for r, row in enumerate(smallRoom):
             row[0] = leftWall
             row[-1] = rightWall
-        room[0] = [upperWall] * LENGTH
-        room[-1] = [floor] * LENGTH
-        return room
+        smallRoom[0] = [upperWall for i in range(LENGTH / 10)]
+        smallRoom[-1] = [floor for i in range(LENGTH / 10)]
+        for i in range(LENGTH / 10):
+            for j in range(LENGTH / 10):
+                room[pos[1] + i][pos[0] + j] = smallRoom[i][j]
 
     def createLandscape(self):
         landscape = [[lightShading for i in range(LENGTH)] for j in range(LENGTH)]

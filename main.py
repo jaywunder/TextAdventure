@@ -13,7 +13,7 @@ from character import Character
 ╥ ╙ ╘ ╒ ╓ ╫ ╪ ┘ ┌ █ ▄ ▌ ▐  ▀ ■ ⌂ ☼ § ∟ ▲ ▼ ♂ ♀ ☺ ☻ ♥ ♦ ♣ ♠ • ○ ◘ ♪ ♫
 ↑ ↓ → ← ↔"""
 
-LENGTH = 100
+LENGTH = 20
 upperWall = "▄▄"
 floor = "▀▀"
 leftWall = "▌ "
@@ -32,14 +32,15 @@ class TextAdventureGame(FloatLayout):
     def __init__(self):
         super(TextAdventureGame, self).__init__()
         self.backgroundWidget = Widget()
-        with self.backgroundWidget.canvas:
-            Color(146. / 256., 76. / 256., 0., 1.)
-            Rectangle(pos=(0, 0), size=self.backgroundWidget.size)
-        self.world = self.createLandscape()
+        with self.backgroundWidget.canvas.before:
+            # Color(146. / 256., 76. / 256., 0., .5)
+            Rectangle(pos=(0, 0), size=Window.size)
+
         self.char = Character()
+        self.world = self.createLandscape()
         self.worldWithCharacter = self.placeChar(self.world, self.char)
         self.worldLabel = Label(
-
+            color=(76. / 256., 146. / 256., 0., 1.),
             text=self.joinRoom(self.worldWithCharacter),
             markup=True,
             center_x=Window.width / 2,
@@ -58,7 +59,7 @@ class TextAdventureGame(FloatLayout):
     def on_key_down(self, *args):
         ##MOVE UP
         if args[2] == UPKEY:
-            self.worldLabel.center_y -= 20
+            self.worldLabel.center_y -= 25
             if self.char.pos[1] - 1 > 0:
                 self.char.pos[1] -= 1
         ## MOVE DOWN
@@ -77,15 +78,16 @@ class TextAdventureGame(FloatLayout):
             if self.char.pos[0] + 2 < LENGTH:
                 self.char.pos[0] += 1
 
-        print(self.char.pos)
-        self.worldLabel.text = self.joinRoom(self.placeChar(self.world, self.char))
+        # print(self.char.pos)
+        self.worldWithCharacter = self.placeChar(self.world, self.char)
+        self.worldLabel.text = self.joinRoom(self.world)
         self.worldLabel.texture_update()
 
     def placeChar(self, room, char):
-        roomWithCharacter = room
-        roomWithCharacter[char.pos[1]][char.pos[0]] = char.head
-        roomWithCharacter[char.pos[1] + 1][char.pos[0]] = char.body
-        return roomWithCharacter
+        newRoom = list(room)
+        newRoom[char.pos[1]][char.pos[0]] = char.head
+        newRoom[char.pos[1] + 1][char.pos[0]] = char.body
+        return newRoom
 
     def joinRoom(self, room):
         finalRoom = ""

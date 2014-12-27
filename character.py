@@ -7,7 +7,7 @@ class Character(object):
         self.name = name
         self.head = head
         self.body = body
-        self.pos = [50, 50]
+        self.pos = [10, 10]
         self.string = self.head + "\n" + self.body
 
         self.headLeft = self.head + " "

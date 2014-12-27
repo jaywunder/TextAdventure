@@ -38,8 +38,9 @@ class TextAdventureGame(FloatLayout):
         super(TextAdventureGame, self).__init__()
         self.backgroundWidget = Widget()
         with self.backgroundWidget.canvas.before:
+            pass
             # Color(76. / 256., 230. / 256., 0., .5)
-            Rectangle(pos=(0, 0), size=Window.size)
+            # Rectangle(pos=(0, 0), size=Window.size)
 
         self.char = Character()
         self.world = self.createLandscape()
